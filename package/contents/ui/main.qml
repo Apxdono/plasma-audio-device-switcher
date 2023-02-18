@@ -25,6 +25,7 @@ import QtQuick.Controls 1.2 as QtControls
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.plasmoid 2.0
+import "../code/icon-ports.js" as IconPorts
 
 // plasma pulseaudio plugin
 import org.kde.plasma.private.volume 0.1
@@ -38,24 +39,6 @@ Item {
 
     property bool showIconsOnly: plasmoid.configuration.showIconsOnly
     property bool useVerticalLayout: plasmoid.configuration.useVerticalLayout
-
-    // from plasma-volume-control applet
-    function iconNameFromPort(port, fallback) {
-        if (port) {
-            if (port.name.indexOf("speaker") !== -1) {
-                return "audio-speakers-symbolic";
-            } else if (port.name.indexOf("headphones") !== -1) {
-                return "audio-headphones";
-            } else if (port.name.indexOf("hdmi") !== -1) {
-                return "video-television";
-            } else if (port.name.indexOf("mic") !== -1) {
-                return "audio-input-microphone";
-            } else if (port.name.indexOf("phone") !== -1) {
-                return "phone";
-            }
-        }
-        return fallback;
-    }
 
     GridLayout {
         id: gridLayout
@@ -72,17 +55,15 @@ Item {
 
             delegate: PlasmaComponents.Button {
                 id: tab
-                enabled: currentPort !== null
-
-                text: showIconsOnly ? "" : currentDescription
-                iconName: showIconsOnly ? iconNameFromPort(currentPort, IconName) : ""
-
                 checkable: true
                 exclusiveGroup: buttonGroup
-                tooltip: currentDescription
+                enabled: currentPort !== null
 
-                Layout.fillWidth: true
-                Layout.preferredWidth: showIconsOnly ? -1 : units.gridUnit * 10
+                tooltip: currentDescription
+                text: showIconsOnly ? "" : currentDescription
+                iconName: showIconsOnly ? IconPorts.portToIconName(currentPort) : ""
+
+                implicitHeight: units.iconSizes.smallMedium
 
                 readonly property var sink: model.PulseObject
                 readonly property var currentPort: model.Ports[ActivePortIndex]
